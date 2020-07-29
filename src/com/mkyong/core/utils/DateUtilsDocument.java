@@ -2,9 +2,10 @@ package com.mkyong.core.utils;
 
 import java.util.Date;
 
-public class DateUtils {
+public class DateUtilsDocument {
 
 	public static void main(String[] args) {
+		
 
 		System.out.println(getLocalCurrentDate());
 		
@@ -16,4 +17,9 @@ public class DateUtils {
 		
 	}
 
+	private Date getLocalCurrentDate1() {
+		int x = 0;
+		return new Date();
+		
+	}
 }
