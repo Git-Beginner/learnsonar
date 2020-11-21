@@ -12,7 +12,7 @@
 
 	<!-- Java sources -->
 	<property name="src.dir" location="src" />
-
+	<property name="test.dir" location="test" />
 	<!-- Java classes -->
 	<property name="build.dir" location="bin" />
 
@@ -24,11 +24,20 @@
 		<tstamp />
 		<!-- Create the build directory structure used by compile -->
 		<mkdir dir="${build.dir}" />
+		<delete dir="${dist.dir}/jacoco" />
+		<mkdir dir="fulfillment" />
 	</target>
 
 	<target name="compile" depends="init" description="compile the source ">
 		<!-- Compile the java code from ${src.dir} into ${build.dir} -->
-		<javac includeantruntime="false" srcdir="${src.dir}" destdir="${build.dir}" />
+		<javac includeantruntime="false" srcdir="${src.dir}" destdir="${build.dir}" debug="true">
+			<classpath location="C:/WS02/scpo/tomcat/config/lib/vendor/junit.jar" />
+			<classpath location="C:/WS02/scpo/tomcat/config/lib/vendor/hamcrest-core-1.1.jar" />
+		</javac>
+		<javac includeantruntime="false" srcdir="${test.dir}" destdir="${build.dir}" debug="true">
+			<classpath location="C:/WS02/scpo/tomcat/config/lib/vendor/junit.jar" />
+			<classpath location="C:/WS02/scpo/tomcat/config/lib/vendor/hamcrest-core-1.1.jar" />
+		</javac>
 	</target>
 
 	<target name="dist" depends="compile" description="package, output to JAR">
@@ -47,26 +56,32 @@
 	<target name="clean" description="clean up">
 		<delete dir="${build.dir}" />
 		<delete dir="${dist.dir}" />
+		<delete dir="fulfillment" />
 	</target>
 
 	<!-- Default, run this -->
-	<target name="main" depends="clean, compile, dist, test" />
+	<target name="main" depends="clean, compile, dist, test, report" />
 
 	<target name="test" depends="compile">
 		<jacoco:coverage destfile="${dist.dir}/jacoco.exec">
 			<junit fork="true" forkmode="once">
-			<test name="com.mkyong.core.utils.UTDateUtils"/>
-			<classpath>
-				<pathelement location="./bin" />
-			</classpath>
+				<batchtest todir="fulfillment">
+					<fileset dir="${test.dir}">
+						<include name="**/**/UT**" />
+					</fileset>
+				</batchtest>
+				<classpath>
+					<pathelement location="./bin" />
+				</classpath>
 				<classpath location="C:/WS02/scpo/tomcat/config/lib/vendor/junit.jar" />
-		        <classpath location="C:/WS02/scpo/tomcat/config/lib/vendor/hamcrest-core-1.1.jar" />
-				
+				<classpath location="C:/WS02/scpo/tomcat/config/lib/vendor/hamcrest-core-1.1.jar" />
+
 			</junit>
 		</jacoco:coverage>
 	</target>
 
 	<target name="report" depends="test">
+		<mkdir dir="jacoco" />
 		<!--  Step 3: Create coverage report  -->
 		<jacoco:report>
 			<!--  This task needs the collected execution data and ...  -->
@@ -76,16 +91,18 @@
 			<!--  the class files and optional source files ...  -->
 			<structure name="JaCoCo Ant Example">
 				<classfiles>
-					<fileset dir="${dist.dir}/jacoco" />
+					<fileset dir="${build.dir}" >
+						<exclude name="**/UT**"/>
+					</fileset>
 				</classfiles>
-				<sourcefiles encoding="UTF-8">
-					<fileset dir="${src.dir}" />
+				<sourcefiles>
+					<fileset dir="src"/>
 				</sourcefiles>
 			</structure>
 			<!--  to produce reports in different formats.  -->
-			<html destdir="${dist.dir}" />
-			<csv destfile="${dist.dir}/report.csv" />
-			<xml destfile="${dist.dir}/report.xml" />
+			<html destdir="jacoco" />
+			<csv destfile="jacoco/report.csv" />
+			<xml destfile="jacoco/report.xml" />
 		</jacoco:report>
 	</target>
 </project>
