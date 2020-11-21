@@ -1,9 +1,14 @@
-<project name="AntJavaProject" default="main" basedir=".">
+
+<project name="AntJavaProject" default="main" basedir="." xmlns:jacoco="antlib:org.jacoco.ant">
 	<description>
 		Create a Java Project (JAR) with Ant build script
 	</description>
 
 	<property name="projectName" value="DateUtils" />
+
+	<taskdef uri="antlib:org.jacoco.ant" resource="org/jacoco/ant/antlib.xml">
+		<classpath path="C:\\WS02\\scpo\\vendor\\jacoco\\jacocoant.jar" />
+	</taskdef>
 
 	<!-- Java sources -->
 	<property name="src.dir" location="src" />
@@ -45,6 +50,42 @@
 	</target>
 
 	<!-- Default, run this -->
-	<target name="main" depends="clean, compile, dist" />
+	<target name="main" depends="clean, compile, dist, test" />
 
+	<target name="test" depends="compile">
+		<jacoco:coverage destfile="${dist.dir}/jacoco.exec">
+			<junit fork="true" forkmode="once">
+			<test name="com.mkyong.core.utils.UTDateUtils"/>
+			<classpath>
+				<pathelement location="./bin" />
+			</classpath>
+				<classpath location="C:/WS02/scpo/tomcat/config/lib/vendor/junit.jar" />
+		        <classpath location="C:/WS02/scpo/tomcat/config/lib/vendor/hamcrest-core-1.1.jar" />
+				
+			</junit>
+		</jacoco:coverage>
+	</target>
+
+	<target name="report" depends="test">
+		<!--  Step 3: Create coverage report  -->
+		<jacoco:report>
+			<!--  This task needs the collected execution data and ...  -->
+			<executiondata>
+				<file file="${dist.dir}/jacoco.exec" />
+			</executiondata>
+			<!--  the class files and optional source files ...  -->
+			<structure name="JaCoCo Ant Example">
+				<classfiles>
+					<fileset dir="${dist.dir}/jacoco" />
+				</classfiles>
+				<sourcefiles encoding="UTF-8">
+					<fileset dir="${src.dir}" />
+				</sourcefiles>
+			</structure>
+			<!--  to produce reports in different formats.  -->
+			<html destdir="${dist.dir}" />
+			<csv destfile="${dist.dir}/report.csv" />
+			<xml destfile="${dist.dir}/report.xml" />
+		</jacoco:report>
+	</target>
 </project>
