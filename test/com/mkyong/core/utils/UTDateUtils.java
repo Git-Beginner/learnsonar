@@ -14,4 +14,12 @@ public class UTDateUtils {
 		
 		Assert.assertNotNull(res);
 	}
+	
+	@Test
+	public void testToMilliSeconds() {
+		
+		long res = DateUtils.toMilliSeconds(new Date());
+		
+		Assert.assertNotNull(res);
+	}
 }

@@ -4,16 +4,12 @@ import java.util.Date;
 
 public class DateUtils {
 
-	public static void main(String[] args) {
-
-		System.out.println(getLocalCurrentDate());
-		
-	}
-
 	public static Date getLocalCurrentDate() {
-	
 		return new Date();
-		
 	}
 
+	public static long toMilliSeconds(Date date) {
+		System.out.print(date);
+		return date.getTime();
+	}
 }
